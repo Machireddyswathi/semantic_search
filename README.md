@@ -14,18 +14,16 @@
 - [Project Overview](#-project-overview)
 - [System Architecture](#-system-architecture)
 - [Component Deep Dives](#-component-deep-dives)
-  - [Embeddings](#1-embeddings)
-  - [Vector Store](#2-vector-store-faiss)
-  - [Fuzzy Clustering](#3-fuzzy-clustering-gmm)
-  - [Semantic Cache](#4-semantic-cache)
 - [Project Structure](#-project-structure)
 - [Installation](#-installation)
 - [Running the Pipeline](#-running-the-pipeline)
+- [About the Model Files](#-about-the-model-files)
 - [API Reference](#-api-reference)
 - [API Usage Examples](#-api-usage-examples)
 - [Docker Setup](#-docker-setup)
 - [Design Decisions](#-design-decisions)
 - [Performance Benchmarks](#-performance-benchmarks)
+- [Running Tests](#-running-tests)
 
 ---
 
@@ -52,6 +50,7 @@ This system answers natural language queries over 18,000+ newsgroup documents us
 ---
 
 ## 🏗️ System Architecture
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        CLIENT REQUEST                            │
@@ -106,6 +105,7 @@ OFFLINE PIPELINE (run once before serving):
 **Model:** `sentence-transformers/all-MiniLM-L6-v2`
 
 This model converts variable-length text into fixed-size 384-dimensional vectors where **semantic similarity = geometric proximity**.
+
 ```
 "NASA launches satellite"    → [0.21, -0.83,  0.44, ... ]  ─┐
 "space agency rocket launch" → [0.19, -0.81,  0.46, ... ]  ─┴─ cosine sim = 0.96
@@ -131,6 +131,7 @@ All vectors are **L2-normalized** (unit sphere), making cosine similarity equiva
 FAISS (Facebook AI Similarity Search) organizes all 16,432 document vectors into an index structure that supports millisecond-speed nearest-neighbor lookup.
 
 **Index type:** `IndexFlatIP` (exact inner product search)
+
 ```
 Query vector: q = [0.21, -0.83, 0.44, ...]
 
@@ -151,6 +152,7 @@ At 16K documents, exact search takes ~2ms — there's no speed/accuracy tradeoff
 Standard clustering (K-Means) forces every document into exactly one cluster. This is wrong for text — a post about *NASA military satellite contracts* belongs to **both** sci.space and politics.
 
 **Gaussian Mixture Model** assigns soft probabilities across all clusters:
+
 ```
 K-Means (hard):
   "NASA military satellite contracts" → Cluster 4
@@ -165,6 +167,7 @@ GMM (fuzzy / soft):
 ```
 
 **Pipeline:**
+
 ```
 Raw embeddings (N × 384)
     │
@@ -182,6 +185,7 @@ Soft assignment matrix (N × 20)   ← rows sum to 1.0
 The "curse of dimensionality" makes distance metrics unreliable in 384D space. PCA reduces to 50D while preserving semantic structure — GMM converges faster and produces tighter clusters.
 
 **Cluster count selection (BIC):**
+
 ```
 n_clusters=10  →  BIC = 1,842,301  (underfitting)
 n_clusters=15  →  BIC = 1,798,442
@@ -196,15 +200,16 @@ n_clusters=25  →  BIC = 1,779,204  (overfitting)
 The cache detects **semantically equivalent queries** to skip redundant computation. Built entirely from Python data structures — no Redis, no Memcached, no caching libraries.
 
 **Architecture:**
+
 ```
 SemanticCache
-├── _store: dict[entry_id → CacheEntry]     ← primary store, O(1) access
+├── _store: dict[entry_id → CacheEntry]      ← primary store, O(1) access
 └── _buckets: dict[cluster_id → [entry_ids]] ← partitioned by GMM cluster
 
 On GET(query_embedding, cluster=7):
   1. Look up _buckets[7]                    ← only ~50 entries (not all 1000)
   2. Dot product with each entry embedding  ← 50 operations, not 1000
-  3. If best_score ≥ 0.85 → HIT            ← return cached result
+  3. If best_score ≥ 0.75 → HIT            ← return cached result
   4. Else → MISS                            ← run full search pipeline
 
 Complexity:  O(C/n) average  vs  O(C) naive
@@ -213,6 +218,7 @@ Complexity:  O(C/n) average  vs  O(C) naive
 ```
 
 **Cache entry lifecycle:**
+
 ```
 New query arrives
      │
@@ -220,7 +226,7 @@ New query arrives
 encode + cluster → check bucket → similarity check
                                         │
                               ┌─────────┴──────────┐
-                           score ≥ 0.85          score < 0.85
+                           score ≥ 0.75          score < 0.75
                               │                      │
                            CACHE HIT             CACHE MISS
                               │                      │
@@ -233,18 +239,27 @@ encode + cluster → check bucket → similarity check
 When cache reaches `max_size=1000`, the entry with the oldest `last_accessed` timestamp is removed.
 
 **TTL:** 1 hour
-Entries expire after 1 hour of inactivity, ensuring search results reflect new indexed documents.
+Entries expire after 1 hour of inactivity, ensuring search results stay fresh.
 
-**Similarity threshold:** `0.85`
+**Similarity threshold:** `0.75`
+
 ```
-score > 0.92  →  too strict: paraphrases missed
-score = 0.85  →  optimal: semantically equivalent queries match ✅
-score < 0.80  →  too loose: unrelated queries incorrectly match
+Tested empirically on this corpus:
+
+"What satellites does NASA use?"
+"How does NASA use satellites?"     → score = 0.8478  → HIT ✅
+
+"space shuttle missions"
+"Which mission landed on the moon?" → score = 0.4858  → MISS ✅ (different question)
+
+"WHO TO COOK PASTA?"
+"space shuttle missions"            → score = 0.2100  → MISS ✅ (unrelated topic)
 ```
 
 ---
 
 ## 📁 Project Structure
+
 ```
 semantic-search-system/
 │
@@ -280,11 +295,15 @@ semantic-search-system/
 │   ├── build_index.py
 │   └── build_clusters.py
 │
-├── models/                        # Saved artifacts (gitignored if large)
-│   ├── faiss_index.bin
-│   ├── gmm_model.pkl
-│   ├── embeddings.npy
-│   └── *.json
+├── models/
+│   ├── faiss_doc_ids.json         ← included in repo
+│   ├── faiss_doc_texts.json       ← included in repo
+│   ├── faiss_doc_metadata.json    ← included in repo
+│   ├── cluster_assignments.json   ← included in repo
+│   ├── cluster_stats.json         ← included in repo
+│   ├── embeddings.npy             ← NOT in repo, generate locally (see below)
+│   ├── faiss_index.bin            ← NOT in repo, generate locally (see below)
+│   └── gmm_model.pkl              ← NOT in repo, generate locally (see below)
 │
 ├── tests/
 │   ├── test_cache.py
@@ -303,18 +322,16 @@ semantic-search-system/
 
 ## ⚙️ Installation
 
-### Prerequisites
-
+**Prerequisites**
 - Python 3.11+
 - pip
 - ~2GB disk space (model + embeddings + index)
 - ~1GB RAM minimum (4GB recommended)
 
-### Steps
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/semantic-search-system.git
-cd semantic-search-system
+git clone https://github.com/Machireddyswathi/Semantic-search-system1
+cd Semantic-search-system1
 
 # 2. Create and activate virtual environment
 python -m venv venv
@@ -332,6 +349,7 @@ cp .env.example .env
 ## 🚀 Running the Pipeline
 
 Run these scripts **once** to build all model artifacts:
+
 ```bash
 # Step 1: Download the 20 Newsgroups dataset (~18,846 documents)
 python scripts/download_data.py
@@ -353,6 +371,7 @@ python main.py
 ```
 
 **Quick test mode** (faster, uses 500 documents):
+
 ```bash
 python scripts/build_embeddings.py --limit 500
 python scripts/build_index.py
@@ -371,6 +390,40 @@ python main.py
 | build_clusters.py | ~5 min |
 | **Total** | **~8 min** |
 
+Open `http://localhost:8000/docs` for the interactive Swagger UI.
+
+---
+
+## 📦 About the Model Files
+
+The JSON files in `models/` store document metadata and index mappings and are **included in the repository**.
+
+Three files are **not included** because they exceed GitHub's 25MB file size limit:
+
+| File | Size | What it contains |
+|---|---|---|
+| `embeddings.npy` | ~25 MB | Float32 matrix of all document embeddings (16432 × 384) |
+| `faiss_index.bin` | ~24 MB | Binary FAISS index structure |
+| `gmm_model.pkl` | ~2 MB | Serialized PCA + GMM pipeline |
+
+**Generate them locally** by running the pipeline scripts above. They save to `models/` automatically and persist across API restarts.
+
+One-command shortcut to build everything:
+
+```bash
+python scripts/download_data.py && \
+python scripts/preprocess.py && \
+python scripts/build_embeddings.py --limit 500 && \
+python scripts/build_index.py && \
+python scripts/build_clusters.py
+```
+
+Then start the server:
+
+```bash
+python main.py
+```
+
 ---
 
 ## 📡 API Reference
@@ -383,12 +436,11 @@ Perform a semantic search. Returns cached result if a similar query was seen bef
 ```json
 {
   "query": "NASA space shuttle mission",
-  "top_k": 5,
-  "similarity_threshold": 0.85
+  "top_k": 5
 }
 ```
 
-**Response:**
+**Response — cache miss:**
 ```json
 {
   "query": "NASA space shuttle mission",
@@ -397,9 +449,9 @@ Perform a semantic search. Returns cached result if a similar query was seen bef
   "matched_query": null,
   "similarity_score": null,
   "cluster_info": {
-    "dominant_cluster": 7,
-    "dominant_prob": 0.6341,
-    "top_clusters": [[7, 0.6341], [2, 0.2104], [14, 0.0891]]
+    "dominant_cluster": 6,
+    "dominant_prob": 0.9977,
+    "top_clusters": [[6, 0.9977], [3, 0.0023], [9, 0.0001]]
   },
   "results": [
     {
@@ -412,19 +464,18 @@ Perform a semantic search. Returns cached result if a similar query was seen bef
     }
   ],
   "total_results": 5,
-  "timestamp": "2024-01-15T12:00:00+00:00"
+  "timestamp": "2026-03-08T12:00:00+00:00"
 }
 ```
 
-**Cache hit response** (second similar query):
+**Response — cache hit (similar follow-up query):**
 ```json
 {
   "query": "space exploration rocket launch astronauts",
   "processing_time_ms": 4.87,
   "cache_hit": true,
   "matched_query": "NASA space shuttle mission",
-  "similarity_score": 0.9138,
-  ...
+  "similarity_score": 0.9138
 }
 ```
 
@@ -434,24 +485,21 @@ Perform a semantic search. Returns cached result if a similar query was seen bef
 
 Returns live cache performance metrics.
 
-**Response:**
 ```json
 {
-  "total_queries": 24,
-  "cache_hits": 9,
-  "cache_misses": 15,
-  "hit_rate_pct": 37.5,
-  "current_size": 15,
+  "total_entries": 15,
+  "hit_count": 9,
+  "miss_count": 15,
+  "hit_rate": 0.375,
   "max_size": 1000,
   "capacity_pct": 1.5,
   "evictions": 0,
-  "similarity_threshold": 0.85,
+  "similarity_threshold": 0.75,
   "ttl_seconds": 3600,
   "avg_hits_per_entry": 0.6,
   "bucket_distribution": {
-    "3": 4, "7": 6, "11": 3, "14": 2
-  },
-  "recent_entries": [...]
+    "3": 4, "6": 6, "11": 3, "14": 2
+  }
 }
 ```
 
@@ -461,12 +509,10 @@ Returns live cache performance metrics.
 
 Clears all cached entries. Use after reindexing documents.
 
-**Response:**
 ```json
 {
   "message": "Cache cleared successfully. 15 entries removed.",
-  "entries_removed": 15,
-  "timestamp": "2024-01-15T12:05:00+00:00"
+  "entries_removed": 15
 }
 ```
 
@@ -476,7 +522,6 @@ Clears all cached entries. Use after reindexing documents.
 
 Returns component health status.
 
-**Response:**
 ```json
 {
   "status": "healthy",
@@ -487,14 +532,14 @@ Returns component health status.
     "cache": "ready"
   },
   "index_size": 16432,
-  "cache_size": 15,
-  "timestamp": "2024-01-15T12:00:00+00:00"
+  "cache_size": 15
 }
 ```
 
 ---
 
 ## 💡 API Usage Examples
+
 ```python
 import requests
 
@@ -509,25 +554,33 @@ def search(query: str, top_k: int = 5) -> dict:
     return response.json()
 
 # Example 1: Fresh search
-result = search("electric vehicles and battery technology")
-print(f"Cache hit: {result['cache_hit']}")
-print(f"Time: {result['processing_time_ms']}ms")
+result = search("NASA space shuttle mission")
+print(f"Cache hit: {result['cache_hit']}")           # False
+print(f"Time: {result['processing_time_ms']}ms")     # ~80ms
 print(f"Cluster: {result['cluster_info']['dominant_cluster']}")
 for doc in result['results']:
     print(f"  [{doc['rank']}] {doc['score']:.4f} | {doc['category']}")
     print(f"       {doc['snippet'][:100]}...")
 
 # Example 2: Semantically equivalent query → instant cache hit
-result2 = search("EV batteries lithium charging infrastructure")
+result2 = search("space exploration rocket launch astronauts")
 print(f"\nCache hit: {result2['cache_hit']}")         # True
 print(f"Time: {result2['processing_time_ms']}ms")     # ~5ms
 print(f"Matched: '{result2['matched_query']}'")
 print(f"Similarity: {result2['similarity_score']:.4f}")
+
+# Check cache stats
+stats = requests.get(f"{BASE_URL}/cache/stats").json()
+print(f"Hit rate: {stats['hit_rate']:.1%}")
+
+# Clear cache
+requests.delete(f"{BASE_URL}/cache")
 ```
 
 ---
 
 ## 🐳 Docker Setup
+
 ```bash
 # Build and run with Docker Compose (recommended)
 docker-compose up --build
@@ -539,6 +592,8 @@ docker run -p 8000:8000 semantic-search
 # Access the API
 curl http://localhost:8000/health
 ```
+
+> Note: The Docker container needs model artifacts to exist in `models/`. Run the pipeline scripts first, then build the Docker image.
 
 ---
 
@@ -552,14 +607,15 @@ curl http://localhost:8000/health
 | PCA before GMM | 384→50 dims | Stabilizes EM, retains 85% variance |
 | Cache partitioning | By GMM cluster | O(C/n) lookup vs O(C) naive |
 | Cache eviction | LRU | Simple, industry standard, effective |
+| Similarity threshold | 0.75 | Tested empirically — catches paraphrases, rejects unrelated |
 | API framework | FastAPI | Async, auto-docs, Pydantic validation |
-| Workers | 1 Uvicorn worker | In-memory state; multi-worker = N×RAM |
+| Workers | 1 Uvicorn worker | In-memory state; multi-worker = N×RAM + split cache |
 
 ---
 
 ## 📊 Performance Benchmarks
 
-Measured on MacBook Pro M1, CPU only:
+Measured on a standard laptop, CPU only:
 
 | Operation | Latency |
 |---|---|
@@ -570,11 +626,12 @@ Measured on MacBook Pro M1, CPU only:
 | GMM cluster predict (single) | ~1ms |
 | Cache lookup (1000 entries, 20 clusters) | ~0.5ms |
 
-**Cache speedup:** ~16× faster on hit vs fresh search
+**Cache speedup: ~16× faster on hit vs fresh search**
 
 ---
 
 ## 🧪 Running Tests
+
 ```bash
 # All tests
 python -m pytest tests/ -v
