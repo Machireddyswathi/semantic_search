@@ -1,0 +1,537 @@
+{
+  "model_metrics": {
+    "log_likelihood": 53.7045,
+    "bic": -1721315.11,
+    "aic": -1736847.8,
+    "converged": true,
+    "n_iter": 15,
+    "n_clusters": 20,
+    "pca_variance_retained": 0.4817
+  },
+  "cluster_summary": [
+    {
+      "cluster_id": 0,
+      "size": 1132,
+      "avg_dominant_prob": 0.9197,
+      "top_categories": [
+        {
+          "category": "comp.sys.ibm.pc.hardware",
+          "count": 333
+        },
+        {
+          "category": "comp.sys.mac.hardware",
+          "count": 297
+        },
+        {
+          "category": "sci.electronics",
+          "count": 130
+        }
+      ]
+    },
+    {
+      "cluster_id": 1,
+      "size": 1791,
+      "avg_dominant_prob": 0.8886,
+      "top_categories": [
+        {
+          "category": "talk.politics.misc",
+          "count": 428
+        },
+        {
+          "category": "alt.atheism",
+          "count": 281
+        },
+        {
+          "category": "talk.religion.misc",
+          "count": 145
+        }
+      ]
+    },
+    {
+      "cluster_id": 2,
+      "size": 543,
+      "avg_dominant_prob": 0.9361,
+      "top_categories": [
+        {
+          "category": "rec.motorcycles",
+          "count": 439
+        },
+        {
+          "category": "rec.autos",
+          "count": 68
+        },
+        {
+          "category": "misc.forsale",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "cluster_id": 3,
+      "size": 1387,
+      "avg_dominant_prob": 0.8441,
+      "top_categories": [
+        {
+          "category": "sci.electronics",
+          "count": 396
+        },
+        {
+          "category": "rec.autos",
+          "count": 174
+        },
+        {
+          "category": "sci.space",
+          "count": 138
+        }
+      ]
+    },
+    {
+      "cluster_id": 4,
+      "size": 648,
+      "avg_dominant_prob": 0.9761,
+      "top_categories": [
+        {
+          "category": "rec.sport.baseball",
+          "count": 613
+        },
+        {
+          "category": "rec.sport.hockey",
+          "count": 30
+        },
+        {
+          "category": "talk.politics.mideast",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "cluster_id": 5,
+      "size": 1309,
+      "avg_dominant_prob": 0.9629,
+      "top_categories": [
+        {
+          "category": "soc.religion.christian",
+          "count": 717
+        },
+        {
+          "category": "alt.atheism",
+          "count": 296
+        },
+        {
+          "category": "talk.religion.misc",
+          "count": 257
+        }
+      ]
+    },
+    {
+      "cluster_id": 6,
+      "size": 536,
+      "avg_dominant_prob": 0.9287,
+      "top_categories": [
+        {
+          "category": "sci.space",
+          "count": 480
+        },
+        {
+          "category": "comp.graphics",
+          "count": 13
+        },
+        {
+          "category": "comp.windows.x",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "cluster_id": 7,
+      "size": 470,
+      "avg_dominant_prob": 0.9594,
+      "top_categories": [
+        {
+          "category": "comp.windows.x",
+          "count": 431
+        },
+        {
+          "category": "comp.os.ms-windows.misc",
+          "count": 21
+        },
+        {
+          "category": "comp.graphics",
+          "count": 17
+        }
+      ]
+    },
+    {
+      "cluster_id": 8,
+      "size": 385,
+      "avg_dominant_prob": 0.9578,
+      "top_categories": [
+        {
+          "category": "comp.sys.ibm.pc.hardware",
+          "count": 182
+        },
+        {
+          "category": "comp.sys.mac.hardware",
+          "count": 99
+        },
+        {
+          "category": "comp.os.ms-windows.misc",
+          "count": 42
+        }
+      ]
+    },
+    {
+      "cluster_id": 9,
+      "size": 1724,
+      "avg_dominant_prob": 0.8462,
+      "top_categories": [
+        {
+          "category": "comp.graphics",
+          "count": 141
+        },
+        {
+          "category": "sci.electronics",
+          "count": 132
+        },
+        {
+          "category": "sci.space",
+          "count": 122
+        }
+      ]
+    },
+    {
+      "cluster_id": 10,
+      "size": 538,
+      "avg_dominant_prob": 0.9638,
+      "top_categories": [
+        {
+          "category": "sci.crypt",
+          "count": 500
+        },
+        {
+          "category": "sci.electronics",
+          "count": 13
+        },
+        {
+          "category": "comp.graphics",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "cluster_id": 11,
+      "size": 571,
+      "avg_dominant_prob": 0.9355,
+      "top_categories": [
+        {
+          "category": "rec.autos",
+          "count": 423
+        },
+        {
+          "category": "rec.motorcycles",
+          "count": 80
+        },
+        {
+          "category": "misc.forsale",
+          "count": 48
+        }
+      ]
+    },
+    {
+      "cluster_id": 12,
+      "size": 642,
+      "avg_dominant_prob": 0.9225,
+      "top_categories": [
+        {
+          "category": "misc.forsale",
+          "count": 408
+        },
+        {
+          "category": "sci.electronics",
+          "count": 78
+        },
+        {
+          "category": "comp.sys.mac.hardware",
+          "count": 45
+        }
+      ]
+    },
+    {
+      "cluster_id": 13,
+      "size": 391,
+      "avg_dominant_prob": 0.9403,
+      "top_categories": [
+        {
+          "category": "talk.politics.guns",
+          "count": 289
+        },
+        {
+          "category": "sci.crypt",
+          "count": 28
+        },
+        {
+          "category": "talk.politics.misc",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "cluster_id": 14,
+      "size": 527,
+      "avg_dominant_prob": 0.9124,
+      "top_categories": [
+        {
+          "category": "comp.os.ms-windows.misc",
+          "count": 201
+        },
+        {
+          "category": "comp.sys.ibm.pc.hardware",
+          "count": 113
+        },
+        {
+          "category": "comp.sys.mac.hardware",
+          "count": 111
+        }
+      ]
+    },
+    {
+      "cluster_id": 15,
+      "size": 714,
+      "avg_dominant_prob": 0.9781,
+      "top_categories": [
+        {
+          "category": "rec.sport.hockey",
+          "count": 686
+        },
+        {
+          "category": "rec.sport.baseball",
+          "count": 25
+        },
+        {
+          "category": "talk.politics.guns",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "cluster_id": 16,
+      "size": 532,
+      "avg_dominant_prob": 0.9232,
+      "top_categories": [
+        {
+          "category": "talk.politics.guns",
+          "count": 260
+        },
+        {
+          "category": "talk.politics.misc",
+          "count": 117
+        },
+        {
+          "category": "talk.religion.misc",
+          "count": 56
+        }
+      ]
+    },
+    {
+      "cluster_id": 17,
+      "size": 1034,
+      "avg_dominant_prob": 0.902,
+      "top_categories": [
+        {
+          "category": "comp.graphics",
+          "count": 386
+        },
+        {
+          "category": "comp.os.ms-windows.misc",
+          "count": 258
+        },
+        {
+          "category": "comp.windows.x",
+          "count": 164
+        }
+      ]
+    },
+    {
+      "cluster_id": 18,
+      "size": 664,
+      "avg_dominant_prob": 0.961,
+      "top_categories": [
+        {
+          "category": "sci.med",
+          "count": 591
+        },
+        {
+          "category": "talk.politics.misc",
+          "count": 22
+        },
+        {
+          "category": "sci.space",
+          "count": 11
+        }
+      ]
+    },
+    {
+      "cluster_id": 19,
+      "size": 670,
+      "avg_dominant_prob": 0.9772,
+      "top_categories": [
+        {
+          "category": "talk.politics.mideast",
+          "count": 609
+        },
+        {
+          "category": "alt.atheism",
+          "count": 21
+        },
+        {
+          "category": "talk.politics.misc",
+          "count": 12
+        }
+      ]
+    }
+  ],
+  "boundary_documents": [
+    {
+      "doc_index": 2964,
+      "dominant": 9,
+      "dominant_prob": 0.289157,
+      "memberships": {
+        "1": 0.271084,
+        "3": 0.200314,
+        "6": 0.237585,
+        "9": 0.289157
+      },
+      "snippet": "Orthodox physicists, astronomers, and astrophysicists CLAIM to be looking for a Unified Field Theory in which all of the forces of the universe can be explained with a single set of laws or equations.",
+      "entropy": 1.3762
+    },
+    {
+      "doc_index": 12797,
+      "dominant": 3,
+      "dominant_prob": 0.286417,
+      "memberships": {
+        "1": 0.221635,
+        "3": 0.286417,
+        "9": 0.215765,
+        "18": 0.236416
+      },
+      "snippet": "Zounds! There s a blast from the past indeed! I d nearly forgotten about the strategic significance of strabismic in r.m lore. It s really good to see it proudly displayed again, although I m sure by ",
+      "entropy": 1.3639
+    },
+    {
+      "doc_index": 6947,
+      "dominant": 3,
+      "dominant_prob": 0.330311,
+      "memberships": {
+        "1": 0.208494,
+        "3": 0.330311,
+        "9": 0.259771,
+        "18": 0.184936
+      },
+      "snippet": "As to what that headpiece is.... by SOURCE AP NEWSWIRE The Vatican, Home Of Genetic Misfits? Michael A. Gillow, noted geneticist, has revealed some unusual data after working undercover in the Vatican",
+      "entropy": 1.3551
+    },
+    {
+      "doc_index": 10199,
+      "dominant": 9,
+      "dominant_prob": 0.364375,
+      "memberships": {
+        "1": 0.234163,
+        "3": 0.213085,
+        "9": 0.364375,
+        "18": 0.188043
+      },
+      "snippet": "I m so glad that you posted your Biological Alchemy discussion. I ve been compared to the famous Robert McElwaine by some readers of Sci. Med. I didn t know how to respond since I had not seen one of ",
+      "entropy": 1.3515
+    },
+    {
+      "doc_index": 13693,
+      "dominant": 9,
+      "dominant_prob": 0.286368,
+      "memberships": {
+        "1": 0.154642,
+        "4": 0.27267,
+        "9": 0.286368,
+        "15": 0.253477
+      },
+      "snippet": "The closest Fleury ever came to fighting was a game two years ago against Los Angeles. There was a scrum and McSorley pinched Fleury s head under his arm. Fleury dropped his gloves and gave McSorley a",
+      "entropy": 1.349
+    },
+    {
+      "doc_index": 10538,
+      "dominant": 9,
+      "dominant_prob": 0.313066,
+      "memberships": {
+        "1": 0.152928,
+        "3": 0.31101,
+        "9": 0.313066,
+        "18": 0.208111
+      },
+      "snippet": "Oh boy, get a small baby and figure out how much brain power they have the first 6 months.... Cheers, Kent",
+      "entropy": 1.3406
+    },
+    {
+      "doc_index": 15883,
+      "dominant": 1,
+      "dominant_prob": 0.36805,
+      "memberships": {
+        "1": 0.36805,
+        "3": 0.158183,
+        "6": 0.207332,
+        "9": 0.262049
+      },
+      "snippet": "LARSONIAN Astronomy and Physics Orthodox physicists, astronomers, and astrophysicists CLAIM to be looking for a Unified Field Theory in which all of the forces of the universe can be explained with a ",
+      "entropy": 1.3367
+    },
+    {
+      "doc_index": 10615,
+      "dominant": 9,
+      "dominant_prob": 0.361419,
+      "memberships": {
+        "1": 0.209224,
+        "3": 0.183101,
+        "9": 0.361419,
+        "15": 0.209047
+      },
+      "snippet": "That is if Mario makes it. Pat Walker sounds like the type that would bring an AK-47 to a game and take pot shots at Mario. stand STILL...dam sunavbich...HMFF",
+      "entropy": 1.3332
+    },
+    {
+      "doc_index": 12354,
+      "dominant": 3,
+      "dominant_prob": 0.36973,
+      "memberships": {
+        "2": 0.162125,
+        "3": 0.36973,
+        "9": 0.287202,
+        "11": 0.18088
+      },
+      "snippet": "Uh, Doug, I don t know what school of thought your from, but chain drive are MUCH more efficient than shafties. End of story. Period. But I will give you that shafties are much less maintenance intens",
+      "entropy": 1.3304
+    },
+    {
+      "doc_index": 10918,
+      "dominant": 9,
+      "dominant_prob": 0.386652,
+      "memberships": {
+        "1": 0.253004,
+        "3": 0.157128,
+        "5": 0.203098,
+        "9": 0.386652
+      },
+      "snippet": "CJF Although I don t personally know about independent sudies, I do know CJF a few things. CJF One of the more amusing things in the BOM is a claim that a CJF civilization existed in North America, ar",
+      "entropy": 1.3297
+    }
+  ],
+  "hyperparameters": {
+    "n_clusters": 20,
+    "n_pca_dims": 50,
+    "soft_threshold": 0.1,
+    "covariance_type": "diag"
+  },
+  "bic_search": {
+    "10": -300009.55,
+    "15": -301517.61,
+    "20": -302795.02,
+    "25": -300710.78
+  }
+}
